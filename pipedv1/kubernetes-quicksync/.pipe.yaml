@@ -1,0 +1,9 @@
+apiVersion: pipecd.dev/v1beta1
+kind: KubernetesApp
+spec:
+  name: simple-app-quicksync
+  labels:
+    env: example
+    team: platform
+  input:
+    namespace: default
