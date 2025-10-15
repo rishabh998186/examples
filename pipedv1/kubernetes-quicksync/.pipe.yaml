@@ -7,3 +7,11 @@ spec:
     team: platform
   input:
     namespace: default
+    manifests:
+      - deployment.yaml
+      - service.yaml
+    kubectlVersion: 1.32.2
+  description: |
+    This app demonstrates how to deploy a Kubernetes application with PipeCD v1 using Quick Sync strategy.\
+    No pipeline is specified, so PipeCD will roll out the new version and switch all traffic to it immediately.\
+    This is a PipeCD v1 example using .pipe.yaml configuration format.

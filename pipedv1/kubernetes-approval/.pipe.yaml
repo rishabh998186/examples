@@ -1,0 +1,46 @@
+apiVersion: pipecd.dev/v1beta1
+kind: KubernetesApp
+spec:
+  name: approval-app-v1
+  labels:
+    env: example
+    team: platform
+  input:
+    namespace: default
+    manifests:
+      - deployment.yaml
+      - service.yaml
+    kubectlVersion: 1.32.2
+  pipeline:
+    stages:
+      - name: K8S_CANARY_ROLLOUT
+        with:
+          replicas: 25%
+      - name: WAIT
+        with:
+          duration: 30s
+      - name: WAIT_APPROVAL
+        with:
+          approvers:
+            - user1@example.com
+            - user2@example.com
+          minApproverNum: 1
+          timeout: 1h
+      - name: K8S_CANARY_ROLLOUT
+        with:
+          replicas: 100%
+      - name: WAIT
+        with:
+          duration: 30s
+      - name: WAIT_APPROVAL
+        with:
+          approvers:
+            - admin@example.com
+          minApproverNum: 1
+          timeout: 30m
+      - name: K8S_PRIMARY_ROLLOUT
+      - name: K8S_CANARY_CLEAN
+  description: |
+    This app demonstrates how to deploy a Kubernetes application with PipeCD v1 using manual approvals.
+    The pipeline requires approval at two stages: after initial canary and before final rollout.
+    This is a PipeCD v1 example using .pipe.yaml configuration format.

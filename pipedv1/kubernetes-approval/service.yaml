@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: approval-app
+spec:
+  selector:
+    app: approval-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP

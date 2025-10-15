@@ -6,6 +6,16 @@ A repository contains some examples for PipeCD.
 
 </br>
 
+### PipeCD v1 Examples (Plugin Architecture)
+
+| Running on Play | Name                                                                        | Description |
+|-----------------|-----------------------------------------------------------------------------|-------------|
+| -- | [kubernetes-quicksync](./pipedv1/kubernetes-quicksync) | Basic Kubernetes deployment with quick sync using PipeCD v1 (.pipe.yaml) configuration. |
+| -- | [kubernetes-canary](./pipedv1/kubernetes-canary) | Kubernetes deployment with canary strategy using PipeCD v1 configuration format. |
+| -- | [kubernetes-bluegreen](./pipedv1/kubernetes-bluegreen) | Kubernetes deployment with blue-green strategy and manual approval using PipeCD v1. |
+| -- | [kubernetes-analysis](./pipedv1/kubernetes-analysis) | Kubernetes deployment with comprehensive analysis (metrics, logs, HTTP) using PipeCD v1. |
+| -- | [kubernetes-approval](./pipedv1/kubernetes-approval) | Kubernetes deployment with multiple manual approval stages using PipeCD v1. |
+
 ### Kubernetes Applications
 
 | Running on Play | Name                                                                        | Description |

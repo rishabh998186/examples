@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-app
+  labels:
+    app: analysis-app
+    pipecd.dev/variant: primary
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: analysis-app
+      pipecd.dev/variant: primary
+  template:
+    metadata:
+      labels:
+        app: analysis-app
+        pipecd.dev/variant: primary
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: main
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+          name: metrics
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

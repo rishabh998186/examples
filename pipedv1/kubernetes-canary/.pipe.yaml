@@ -1,0 +1,37 @@
+apiVersion: pipecd.dev/v1beta1
+kind: KubernetesApp
+spec:
+  name: canary-app-v1
+  labels:
+    env: example
+    team: platform
+  input:
+    namespace: default
+    manifests:
+      - deployment.yaml
+      - service.yaml
+    kubectlVersion: 1.32.2
+  pipeline:
+    stages:
+      - name: K8S_CANARY_ROLLOUT
+        with:
+          replicas: 10%
+      - name: WAIT
+        with:
+          duration: 10s
+      - name: K8S_CANARY_ROLLOUT
+        with:
+          replicas: 50%
+      - name: ANALYSIS
+        with:
+          duration: 30s
+          metrics:
+            - query: grpc_error_percentage
+              expected: <0.1
+              interval: 1m
+      - name: K8S_PRIMARY_ROLLOUT
+      - name: K8S_CANARY_CLEAN
+  description: |
+    This app demonstrates how to deploy a Kubernetes application with PipeCD v1 using Canary strategy.
+    The pipeline performs a gradual rollout: 10% -> 50% -> 100% with analysis between stages.
+    This is a PipeCD v1 example using .pipe.yaml configuration format.

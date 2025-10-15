@@ -1,0 +1,51 @@
+apiVersion: pipecd.dev/v1beta1
+kind: KubernetesApp
+spec:
+  name: analysis-app-v1
+  labels:
+    env: example
+    team: platform
+  input:
+    namespace: default
+    manifests:
+      - deployment.yaml
+      - service.yaml
+    kubectlVersion: 1.32.2
+  pipeline:
+    stages:
+      - name: K8S_CANARY_ROLLOUT
+        with:
+          replicas: 30%
+      - name: ANALYSIS
+        with:
+          duration: 2m
+          metrics:
+            - query: |
+                rate(http_requests_total{job="analysis-app-v1"}[1m])
+              expected: ">0.5"
+              interval: 10s
+              provider: prometheus-dev
+            - query: |
+                rate(http_requests_total{job="analysis-app-v1", status=~"5.*"}[1m]) /
+                rate(http_requests_total{job="analysis-app-v1"}[1m])
+              expected: "<0.05"
+              interval: 10s
+              provider: prometheus-dev
+          logs:
+            - query: |
+                resource.labels.container_name="analysis-app-v1" AND
+                severity="ERROR"
+              expected: <10
+              interval: 10s
+              provider: stackdriver-dev
+          https:
+            - url: https://analysis-app-v1.example.com/healthz
+              method: GET
+              expected: 200
+              interval: 10s
+      - name: K8S_PRIMARY_ROLLOUT
+      - name: K8S_CANARY_CLEAN
+  description: |
+    This app demonstrates how to deploy a Kubernetes application with PipeCD v1 using automated analysis.
+    The analysis stage checks metrics, logs, and HTTP endpoints before proceeding with full deployment.
+    This is a PipeCD v1 example using .pipe.yaml configuration format.

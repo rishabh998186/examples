@@ -1,0 +1,27 @@
+apiVersion: pipecd.dev/v1beta1
+kind: KubernetesApp
+spec:
+  name: bluegreen-app-v1
+  labels:
+    env: example
+    team: platform
+  input:
+    namespace: default
+    manifests:
+      - deployment.yaml
+      - service.yaml
+    kubectlVersion: 1.32.2
+  pipeline:
+    stages:
+      - name: K8S_BLUE_GREEN_ROLLOUT
+      - name: WAIT_APPROVAL
+        with:
+          approvers:
+            - user1@example.com
+            - user2@example.com
+      - name: K8S_PRIMARY_ROLLOUT
+      - name: K8S_BLUE_GREEN_CLEAN
+  description: |
+    This app demonstrates how to deploy a Kubernetes application with PipeCD v1 using Blue-Green strategy.
+    The pipeline deploys to a separate environment and requires manual approval before switching traffic.
+    This is a PipeCD v1 example using .pipe.yaml configuration format.
